@@ -5,7 +5,7 @@
 #include "block_B_navigation.h"
 #include "block_C_interface.h"
 // Define pins
-// ----- OLED pins (already in your code) -----
+// ----- OLED pins  -----
 #define TFT_CS   5
 #define TFT_DC   2
 #define TFT_RST  4
