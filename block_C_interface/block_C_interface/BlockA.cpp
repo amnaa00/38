@@ -13,8 +13,7 @@ void initMovement() {
     // Motor B (Right) Direction
     pinMode(MTRB_IN1, OUTPUT);
     pinMode(MTRB_IN2, OUTPUT);
-    // Standby Pin
-    pinMode(MTR_STBY_PIN, OUTPUT);
+   
     
     // Set 4 sensor pins as inputs
     pinMode(LINE_OUTER_LEFT, INPUT_PULLDOWN);
@@ -29,10 +28,6 @@ void initMovement() {
     // Motor B (Right)
     ledcAttach(MTRB_EN, PWM_FREQ, PWM_RESOLUTION);
 
- 
-    
-    // 3. Enable TB6612FNG Driver (Set STBY HIGH)
-    digitalWrite(MTR_STBY_PIN, HIGH);
     
     stopMoving();
     
