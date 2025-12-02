@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include "BlockA.h" 
 #include "driver/ledc.h" 
@@ -17,9 +18,7 @@ void initMovement() {
     
     // Set 4 sensor pins as inputs
     pinMode(LINE_OUTER_LEFT, INPUT_PULLDOWN);
-    pinMode(LINE_INNER_LEFT, INPUT_PULLDOWN);
     pinMode(LINE_INNER_RIGHT, INPUT_PULLDOWN);
-    pinMode(LINE_OUTER_RIGHT, INPUT_PULLDOWN); 
     pinMode(LINE_CENTER, INPUT_PULLDOWN);
 
     // 2. Setup ESP32 PWM (LEDC) Channels
@@ -110,13 +109,12 @@ void turnRight() {
 
 uint8_t readLineSensors() {
     int ol  = digitalRead(LINE_OUTER_LEFT);
-    int il  = digitalRead(LINE_INNER_LEFT);
     int cs = digitalRead(LINE_CENTER);
     int ir = digitalRead(LINE_INNER_RIGHT);
-    int or_val = digitalRead(LINE_OUTER_RIGHT);
+    
 
     // Combine into a 4-bit pattern: OL IL IR OR
-    return (ol << 4) | (il << 3) | (cs << 2) | (ir << 1) | or_val;
+    return   ( ol<< 2) | (cs << 1) | ir;
 }
 
 // 4. AUTONOMOUS LINE FOLLOWING  
@@ -133,41 +131,42 @@ void runLineFollow() {
     digitalWrite(MTRB_IN2, HIGH);
 
     //  Line Following Logic 
+      //  Line Following Logic 
     switch (pattern) {
         
         // 1. PERFECT/NEAR-PERFECT CENTERED (OL IL IR OR) ---
-        case 0b11011: // Only Center ON
-        case 0b10001: // Inner three ON (Ideal)
-        case 0b11001: // Center & Inner Right ON (Slightly left)
-        case 0b10011: // Inner Left & Center ON (Slightly right)
-            ledcWrite(MTRA_EN, speed);
+        case 0b101: // Only Center ON
+            ledcWrite(MTRA_EN, speed+2.5);
             ledcWrite(MTRB_EN, speed);
             break;
 
         //  2. GENTLE CORRECTION LEFT (Drifting Right) ---
-        case 0b11000: // 0011: Inner Right and Outer Right are on line.
-        case 0b11100: 
-        case 0b11110:// 0001: Only Outer Right on line.
-            ledcWrite(MTRA_EN, speed);        // Full speed Motor A (Left)
-            ledcWrite(MTRB_EN, speed / 2);   // Half speed Motor B (Right) (Gentle correction)
+        case 0b100: // 0011: Inner Right and Outer Right are on line.
+            ledcWrite(MTRA_EN, speed+2.5);        // Full speed Motor A (Left)
+            ledcWrite(MTRB_EN, speed / 3);   // Half speed Motor B (Right) (Gentle correction)
             break;
 
         // 3. GENTLE CORRECTION RIGHT (Drifting Left) ---
-        case 0b00011: // 1100: Outer Left and Inner Left are on line.
-        case 0b00111:
-        case 0b01111: // 1000: Only Outer Left on line.
-            ledcWrite(MTRA_EN, speed / 2);    // Half speed Motor A (Left)
+        case 0b001: // 1100: Outer Left and Inner Left are on line.
+            ledcWrite(MTRA_EN, speed / 3);    // Half speed Motor A (Left)
             ledcWrite(MTRB_EN, speed);       // Full speed Motor B (Right) (Gentle correction)
             break;
-
+            //HANDLING HARD TURN
+        case 0b110:
+            ledcWrite(MTRA_EN,0);
+            ledcWrite(MTRB_EN, speed);
+            break;
+        case 0b011:
+            ledcWrite(MTRA_EN,speed);
+            ledcWrite(MTRB_EN, 0);
+            break;
         //  4. LOST LINE / SAFETY STOP ---
-        case 0b11111: // 0000: Lost line 
+        case 0b111: // 0000: Lost line 
             stopMoving();
             break;
 
         // 5. INTERSECTION / STOP LINE ---
-        case 0b00000: // 1111: All sensors on. Intersection or Wide Stop Line.
-        case 0b10000: // Almost all sensors ON 
+        case 0b000: // 1111: All sensors on. Intersection or Wide Stop Line.
             ledcWrite(MTRA_EN, speed / 3);
             ledcWrite(MTRB_EN, speed / 3);
             break;
@@ -178,4 +177,5 @@ void runLineFollow() {
             ledcWrite(MTRB_EN, speed);
             break;
     }
+
 }
