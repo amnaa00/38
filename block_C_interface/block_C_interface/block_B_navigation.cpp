@@ -53,19 +53,19 @@ int lookRight() {
 }
 
 void smoothOpen() {
-  for (int a = 90; a >= 0; a -= 3) {
-    gripperServo.write(a);
-    delay(15);
+  for (int angle = 90; angle >= 0; angle -= 2) {
+    gripper.write(angle);
+    delay(20);
   }
 }
+
 
 void smoothClose() {
-  for (int a = 0; a <= 90; a += 3) {
-    gripperServo.write(a);
-    delay(15);
+  for (int angle = 0; angle <= 90; angle += 2) {
+    gripper.write(angle);
+    delay(20);
   }
 }
-
 void pickObject() {
   smoothOpen();
   delay(200);
