@@ -4,11 +4,13 @@
 
 #include <ESP32Servo.h>
 
-#define TRIG_PIN           14
-#define ECHO_PIN           12
+#define TRIG_PIN 13
+#define ECHO_PIN 12
+//#define TRIG_PIN           14
+//#define ECHO_PIN           12
 
-#define SCAN_SERVO_PIN      5
-#define GRIPPER_SERVO_PIN  15
+#define SCAN_SERVO_PIN      15
+#define GRIPPER_SERVO_PIN  5
 
 void initBlockB();
 long getDistanceCm();
